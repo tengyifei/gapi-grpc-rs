@@ -29,12 +29,41 @@ def main():
 
     cmd_lines = res.stdout.decode('utf-8').split('\n')[:-1]
 
+    ignored = []
+    for p in cmd_lines:
+        if 'ondemandscanning' in p:
+            ignored.append(p)
+        elif 'google.ads' in p:
+            ignored.append(p)
+        elif 'google.cloud' in p:
+            ignored.append(p)
+        elif 'ccc.hosted' in p:
+            ignored.append(p)
+        elif 'spanner' in p:
+            ignored.append(p)
+        elif 'grafeas' in p:
+            ignored.append(p)
+        elif 'firestore' in p:
+            ignored.append(p)
+        elif 'google.devtools' in p:
+            ignored.append(p)
+        elif 'bigtable' in p:
+            ignored.append(p)
+        elif 'analytics' in p:
+            ignored.append(p)
+        elif 'example' in p:
+            ignored.append(p)
+        elif 'genomics' in p:
+            ignored.append(p)
+    print(ignored)
+    for i in ignored:
+        cmd_lines.remove(i)
+
     #
     # lib.rs
     #
 
     packages_list = [x.split(' ')[0] for x in cmd_lines]
-
     mods = []
     for i in range(len(packages_list) - 1):
         p1 = packages_list[i]
@@ -45,7 +74,9 @@ def main():
             packages_list[i] = None
             mods.append(p1)
 
-    ignore_packages = ['google.firebase.fcm.connection.v1alpha1']
+    ignore_packages = [
+        'google.firebase.fcm.connection.v1alpha1',
+    ]
     for package in ignore_packages:
         packages_list.remove(package)
 
@@ -67,6 +98,7 @@ def main():
     #
 
     paths = [x.split(' ')[1] for x in cmd_lines]
+
     tpl_build_rs = env.get_template('build.rs.jinja')
     txt_built_rs = tpl_build_rs.render({'paths': paths})
 
